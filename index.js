@@ -6,6 +6,18 @@ const cheerio = require('cheerio');
 const URL = require('url').URL;
 const client = new Discord.Client();
 
+client.on('guildCreate', server => {
+    const embed = new Discord.MessageEmbed()
+        .setColor('#e1e6ed')
+        .setTitle('Giorgio Bot')
+        .setDescription('Con questo bot puoi aggiengere un simpatco TTS nei canali vocali, divertiti ;)')
+        .addFields({ name: 'Istruzioni', value: 'per usare il bot usa il comando !giorgio seguito dalla frase che vuoi far ripetere' });
+
+    const channel = server.channels.cache.filter(channel => channel.type === 'text').first();
+    if (channel)
+        channel.send(embed);
+})
+
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
