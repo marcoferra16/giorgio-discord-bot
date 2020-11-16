@@ -32,6 +32,9 @@ client.on('message', async msg => {
             return;
         }
 
+        if (msg.deletable)
+            msg.delete()
+
         const form = new FormData();
         form.append("but", "Invia");
         form.append("but1", testo);
