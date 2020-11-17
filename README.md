@@ -1,0 +1,1 @@
+Con questo bot puoi aggiengere un simpatco TTS nei canali vocali, divertiti ;)
