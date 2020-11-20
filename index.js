@@ -44,7 +44,17 @@ async function playAudio(channel, url) {
 }
 
 client.on('message', async msg => {
-    if (msg.content.startsWith('!giorgio')) {
+    if (msg.content.startsWith('!giorgiostop')) {
+        if (connection) {
+            connection.disconnect();
+            connection = null;
+
+            if (msg.deletable)
+                msg.delete();
+        } else {
+            msg.reply("devo essere in un canale vocale!");
+        }
+    } else if (msg.content.startsWith('!giorgio')) {
         const testo = msg.content.substr(8).trim();
         console.log(testo);
 
