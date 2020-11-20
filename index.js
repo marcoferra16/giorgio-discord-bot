@@ -4,6 +4,7 @@ const axios = require("axios");
 const FormData = require("form-data");
 const cheerio = require('cheerio');
 const URL = require('url').URL;
+const Queue = require('promise-queue');
 const client = new Discord.Client();
 
 client.on('guildCreate', server => {
@@ -21,6 +22,26 @@ client.on('guildCreate', server => {
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
+
+const queue = new Queue(1, Infinity);
+let connection = null;
+
+async function playAudio(channel, url) {
+    if (!connection)
+        connection = await channel.join();
+
+    return new Promise((resolve, reject) => {
+        const dispatcher = connection.play(url);
+        dispatcher.on("finish", () => {
+            if (queue.getQueueLength() === 0) {
+                connection.disconnect();
+                connection = null;
+            }
+            resolve();
+        });
+        dispatcher.on("error", reject);
+    });
+}
 
 client.on('message', async msg => {
     if (msg.content.startsWith('!giorgio')) {
@@ -44,9 +65,7 @@ client.on('message', async msg => {
         console.log(url);
 
         if (msg.member.voice.channel) {
-            const connection = await msg.member.voice.channel.join();
-            const dispatcher = connection.play(url);
-            dispatcher.on("finish", () => connection.disconnect());
+            queue.add(() => playAudio(msg.member.voice.channel, url));
         } else {
             msg.reply("devi essere in un canale vocale!");
         }
